@@ -1,69 +1,138 @@
 setwd("~/Users/gregoirerouaud-jegou/Dossiers/R") 
+
+#Read all 5 csv files
 Thales = read.csv('HO.PA.csv', header = TRUE, sep=',')
+Safran = read.csv('SAF.PA.csv', header = TRUE, sep=',')
+Airbus = read.csv('AIR.PA.csv', header = TRUE, sep=',')
+Vinci = read.csv('DG.PA.csv', header = TRUE, sep=',')
+SchneiderElectric = read.csv('SU.PA.csv', header = TRUE, sep=',')
 
-result <- mean(Thales$Close)
-print(result)
-D_Thales = read.csv('D-HO.PA.csv', header = TRUE, sep=',')
-
-sommediv <- sum(D_Thales$Dividends)
-sommevolume 
-
+#install additional packages and libraries
 install.packages('tidyverse')
 library(tidyverse)
-Test1 <- as_tibble(Thales)
-Test1
-
-# Load the required library
 library(dplyr)
 
-# Read the "Thales" and "D_Thales" CSV files into data frames
-Thales <- read.csv("HO.PA.csv")
-D_Thales <- read.csv("D_Thales.csv")
+#Calculate prices means for all 5 stocks
+ThalesPriceMean <- mean(Thales$Close)
+SafranPriceMean <- mean(Safran$Close)
+AirbusPriceMean <- mean(Airbus$Close)
+VinciPriceMean <- mean(Vinci$Close)
+SchneiderElectricPriceMean <- mean(SchneiderElectric$Close)
 
-# Merge the two data frames based on the "Date" column
-merged_data <- Thales %>%
-  left_join(D_Thales, by = "Date") %>%
-  mutate(Dividends = ifelse(is.na(Dividends), 0, Dividends))
+#Calculate returns means for all 5 stocks
 
-## Add a calculated column "Volume_x_Dividends" to the merged data frame
-merged_data <- merged_data %>%
-  mutate(Volume_x_Dividends = Volume * Dividends)
+#Calculate daily returns: Rt = [ Pt - Pt-1 ]/ Pt-1
+ThalesReturn = diff(Thales$Adj.Close)/Thales$Adj.Close[-length(Thales$Adj.Close)]
+#Calculate overall returns mean
+ThalesReturnMean <- mean(ThalesReturn)
+#Same as Thales for all 4 remaining stock
+#For Safran
+SafranReturn = diff(Safran$Adj.Close)/Safran$Adj.Close[-length(Safran$Adj.Close)]
+SafranReturnMean <- mean(SafranReturn)
+#For Airbus
+AirbusReturn = diff(Airbus$Adj.Close)/Airbus$Adj.Close[-length(Airbus$Adj.Close)]
+AirbusReturnMean <- mean(AirbusReturn)
+#For Vinci
+VinciReturn = diff(Vinci$Adj.Close)/Vinci$Adj.Close[-length(Vinci$Adj.Close)]
+VinciReturnMean <- mean(VinciReturn)
+#For Schneider Electric
+ReturnSchneiderElectric = diff(SchneiderElectric$Adj.Close)/SchneiderElectric$Adj.Close[-length(SchneiderElectric$Adj.Close)]
+SchneiderElectricReturnMean <- mean(ReturnSchneiderElectric)
 
-# View the updated data frame
-View(merged_data)
 
-total_sum <- sum(merged_data$Dividends)
+#Calculate the confidence interval of Prices mean
+#For Thales
+ThalesPCI <- lm(Thales$Close ~ 1) 
+confint(ThalesPCI, level=0.95)
+#For Safran
+SafranPCI <- lm(Safran$Close ~ 1) 
+confint(SafranPCI, level=0.95)
+#For Airbus
+AirbusPCI <- lm(Airbus$Close ~ 1) 
+confint(AirbusPCI, level=0.95)
+#For Vinci
+VinciPCI <- lm(Vinci$Close ~ 1) 
+confint(VinciPCI, level=0.95)
+#For SchneiderElectric
+SchneiderElectricPCI <- lm(SchneiderElectric$Close ~ 1) 
+confint(SchneiderElectricPCI, level=0.95)
 
-# Print the total sum
-cat("The total sum of Volume_x_Dividends is:", total_sum, "\n")
 
-#(((Ending stock price - Starting stock price) + Dividends received) / Starting stock price) * 100
+#Calculate the confidence interval of Returns mean
+#For Thales
+ThalesRCI <- lm(Thales$Adj.Close ~ 1) 
+confint(ThalesRCI, level=0.95)
+#For Safran
+SafranRCI <- lm(Safran$Adj.Close ~ 1) 
+confint(SafranRCI, level=0.95)
+#For Airbus
+AirbusRCI <- lm(Airbus$Adj.Close ~ 1) 
+confint(AirbusRCI, level=0.95)
+#For Vinci
+VinciRCI <- lm(Vinci$Adj.Close ~ 1) 
+confint(VinciRCI, level=0.95)
+#For SchneiderElectric
+SchneiderElectricRCI <- lm(SchneiderElectric$Adj.Close ~ 1) 
+confint(SchneiderElectricRCI, level=0.95)
 
-# Extract the starting and ending stock prices
-starting_stock_price <- merged_data$Open[1]
-ending_stock_price <- merged_data$Close[nrow(merged_data)]
+#Calculate statistical significance of having the mean value higher/lower by 10% 
+#than the existing ones. Explain.
 
-# Calculate the formula
-dividends_received <- total_sum
-percentage_return <- (((ending_stock_price - starting_stock_price) + dividends_received) / starting_stock_price) * 100
+# Assume you have already calculated ThalesPriceMean and ThalesPCI from your previous code
+# Define the hypothesized mean values (mean ± 10%)
+Thales_H_mean_high <- ThalesPriceMean * 1.1
+Thales_H_mean_low <- ThalesPriceMean * 0.9
+
+# Perform t-test to check statistical significance for mean higher by 10%
+Thales_t_test_high <- t.test(Thales$Close, mu = Thales_H_mean_high)
+
+# Perform t-test to check statistical significance for mean lower by 10%
+Thales_t_test_low <- t.test(Thales$Close, mu = Thales_H_mean_low)
 
 # Print the results
-cat("Starting stock price:", starting_stock_price, "\n")
-cat("Ending stock price:", ending_stock_price, "\n")
-cat("Dividends received:", dividends_received, "\n")
-cat("Percentage return:", percentage_return, "%\n")
+cat("T-test result for mean higher by 10%:\n")
+print(Thales_t_test_high)
 
-# SOLUTION YOUTUBE : Extract the starting and ending stock prices
-starting_stock_price2 <- merged_data$Adj.Close[1]
-ending_stock_price2 <- merged_data$Adj.Close[nrow(merged_data)]
+cat("\nT-test result for mean lower by 10%:\n")
+print(Thales_t_test_low)
 
-# Calculate the formula
-dividends_received2 <- total_sum
-percentage_return2 <- ((ending_stock_price2 / starting_stock_price2) - 1 ) * 100
+#For Safran:
+Safran_H_mean_high <- SafranPriceMean * 1.1
+Safran_H_mean_low <- SafranPriceMean * 0.9
+Safran_t_test_high <- t.test(Safran$Close, mu = Safran_H_mean_high)
+Safran_t_test_low <- t.test(Safran$Close, mu = Safran_H_mean_low)
+cat("T-test result for mean higher by 10%:\n")
+print(Safran_t_test_high)
+cat("\nT-test result for mean lower by 10%:\n")
+print(Safran_t_test_low)
 
-# Print the results
-cat("Starting stock price2:", starting_stock_price2, "\n")
-cat("Ending stock price2:", ending_stock_price2, "\n")
-cat("Dividends received2:", dividends_received2, "\n")
-cat("Percentage return2:", percentage_return2, "%\n")
+#For Airbus:
+Airbus_H_mean_high <- AirbusPriceMean * 1.1
+Airbus_H_mean_low <- AirbusPriceMean * 0.9
+Airbus_t_test_high <- t.test(Airbus$Close, mu = Airbus_H_mean_high)
+Airbus_t_test_low <- t.test(Airbus$Close, mu = Airbus_H_mean_low)
+cat("T-test result for mean higher by 10%:\n")
+print(Airbus_t_test_high)
+cat("\nT-test result for mean lower by 10%:\n")
+print(Airbus_t_test_low)
+
+#For Vinci:
+Vinci_H_mean_high <- VinciPriceMean * 1.1
+Vinci_H_mean_low <- VinciPriceMean * 0.9
+Vinci_t_test_high <- t.test(Vinci$Close, mu = Vinci_H_mean_high)
+Vinci_t_test_low <- t.test(Vinci$Close, mu = Vinci_H_mean_low)
+cat("T-test result for mean higher by 10%:\n")
+print(Vinci_t_test_high)
+cat("\nT-test result for mean lower by 10%:\n")
+print(Vinci_t_test_low)
+
+#For SchneiderElectric:
+SchneiderElectric_H_mean_high <- SchneiderElectricPriceMean * 1.1
+SchneiderElectric_H_mean_low <- SchneiderElectricPriceMean * 0.9
+SchneiderElectric_t_test_high <- t.test(SchneiderElectric$Close, mu = SchneiderElectric_H_mean_high)
+SchneiderElectric_t_test_low <- t.test(SchneiderElectric$Close, mu = SchneiderElectric_H_mean_low)
+cat("T-test result for mean higher by 10%:\n")
+print(SchneiderElectric_t_test_high)
+cat("\nT-test result for mean lower by 10%:\n")
+print(SchneiderElectric_t_test_low)
 
