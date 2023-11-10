@@ -18,6 +18,8 @@ library(fBasics)
 library(tidyverse)
 library(dplyr)
 
+### Question 1
+
 #Calculate prices means for all 5 stocks
 ThalesPriceMean <- mean(Thales$Close)
 SafranPriceMean <- mean(Safran$Close)
@@ -192,12 +194,13 @@ boxplot(VinciReturn, main = "Boxplot of Returns for Thales", ylab = "Returns")
 # For SchneiderElectric
 boxplot(SchneiderElectricReturn, main = "Boxplot of Returns for Thales", ylab = "Returns")
 
+
+### Question 3
+
 #Select and perform 3 univariate tests for each series (e.g., Shapiro-Wilk, Kolmogorov-
 #Smirnov, Jarque-Bera, D’Agostino test of skewness, Anscombe-Glynn test of kurtosis, 
 #Bonett- Seier test of kurtosis, Anderson-Darling goodness of fit test). 
 #Explain why you select those three tests. Explain the results.
-
-
 
 #### WARNING #####
 #pour les tests suivants on doit en faire que 3 et expliquer pourquoi
@@ -205,7 +208,6 @@ boxplot(SchneiderElectricReturn, main = "Boxplot of Returns for Thales", ylab = 
 #Une fois qu'on aura choisi les 3 qu'on veut faire on doit les répéter sur les 
 #4 autres actions (j'ai pas fait pour nous éviter de faire les autres pour r)
 ####WARNING####
-
 
 # Shapiro-Wilk Test for Thales
 shapiro_test_result <- shapiro.test(ThalesReturn)
@@ -230,6 +232,8 @@ print(anscombe_glynn_test_result)
 # Bonett-Seier Test
 BonnTest <- bonett.test (ThalesReturn, alternative = "two.sided" )
 print(BonnTest)
+
+### Question 4
 
 ##Perform the multivariate tests: Pearson’s product moment correlation coefficient 
 #t-test, Spearman rank correlation test, Kendall’s tau correlation coefficient test. 
