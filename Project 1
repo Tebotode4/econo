@@ -9,6 +9,12 @@ SchneiderElectric = read.csv('SU.PA.csv', header = TRUE, sep=',')
 
 #install additional packages and libraries
 install.packages('tidyverse')
+install.packages('fBasics')
+install.packages('nortest')
+install.packages('moments')
+library(moments)
+library(nortest)
+library(fBasics)
 library(tidyverse)
 library(dplyr)
 
@@ -36,8 +42,8 @@ AirbusReturnMean <- mean(AirbusReturn)
 VinciReturn = diff(Vinci$Adj.Close)/Vinci$Adj.Close[-length(Vinci$Adj.Close)]
 VinciReturnMean <- mean(VinciReturn)
 #For Schneider Electric
-ReturnSchneiderElectric = diff(SchneiderElectric$Adj.Close)/SchneiderElectric$Adj.Close[-length(SchneiderElectric$Adj.Close)]
-SchneiderElectricReturnMean <- mean(ReturnSchneiderElectric)
+SchneiderElectricReturn = diff(SchneiderElectric$Adj.Close)/SchneiderElectric$Adj.Close[-length(SchneiderElectric$Adj.Close)]
+SchneiderElectricReturnMean <- mean(SchneiderElectricReturn)
 
 
 #Calculate the confidence interval of Prices mean
@@ -135,4 +141,122 @@ cat("T-test result for mean higher by 10%:\n")
 print(SchneiderElectric_t_test_high)
 cat("\nT-test result for mean lower by 10%:\n")
 print(SchneiderElectric_t_test_low)
+
+### Question 2
+
+# Calculate general statistics for returns
+#For Thales
+return_stats <- function(returns) {
+  stats <- c(
+    Mean = mean(returns),
+    Trimmed_Mean = mean(returns, trim = 0.1),  # 10% trimming
+    Median = median(returns),
+    Variance = var(returns),
+    Std_Deviation = sd(returns),
+    Mean_Absolute_Deviation = mean(abs(returns - mean(returns))),
+    Median_Absolute_Deviation = median(abs(returns - median(returns))),
+    Quantiles_25th = quantile(returns, 0.25),
+    Quantiles_50th = quantile(returns, 0.5),
+    Quantiles_75th = quantile(returns, 0.75),
+    Kurtosis = kurtosis(returns),
+    Skewness = skewness(returns)
+  )
+  
+  return(stats)
+}
+
+# Calculate and print statistics for Thales returns
+Thales_return_stats <- return_stats(ThalesReturn)
+print(thales_return_stats)
+#For Safran
+Safran_return_stats <- return_stats(SafranReturn)
+print(safran_return_stats)
+#For Airbus
+Airbus_return_stats <- return_stats(AirbusReturn)
+print(Airbus_return_stats)
+#For Vinci
+Vinci_return_stats <- return_stats(VinciReturn)
+print(Vinci_return_stats)
+#For SchneiderElectric
+SchneiderElectric_return_stats <- return_stats(SchneiderElectricReturn)
+print(SchneiderElectric_return_stats)
+
+# Create a boxplot to check for outliers for Thales
+boxplot(ThalesReturn, main = "Boxplot of Returns for Thales", ylab = "Returns")
+# For Safran
+boxplot(SafranReturn, main = "Boxplot of Returns for Thales", ylab = "Returns")
+# For Airbus
+boxplot(AirbusReturn, main = "Boxplot of Returns for Thales", ylab = "Returns")
+# For Vinci
+boxplot(VinciReturn, main = "Boxplot of Returns for Thales", ylab = "Returns")
+# For SchneiderElectric
+boxplot(SchneiderElectricReturn, main = "Boxplot of Returns for Thales", ylab = "Returns")
+
+#Select and perform 3 univariate tests for each series (e.g., Shapiro-Wilk, Kolmogorov-
+#Smirnov, Jarque-Bera, D’Agostino test of skewness, Anscombe-Glynn test of kurtosis, 
+#Bonett- Seier test of kurtosis, Anderson-Darling goodness of fit test). 
+#Explain why you select those three tests. Explain the results.
+
+
+
+#### WARNING #####
+#pour les tests suivants on doit en faire que 3 et expliquer pourquoi
+#on a choisi de faire ces 3 la et pas les autres
+#Une fois qu'on aura choisi les 3 qu'on veut faire on doit les répéter sur les 
+#4 autres actions (j'ai pas fait pour nous éviter de faire les autres pour r)
+####WARNING####
+
+
+# Shapiro-Wilk Test for Thales
+shapiro_test_result <- shapiro.test(ThalesReturn)
+print(shapiro_test_result)
+
+# Anderson-Darling Test for Thales
+anderson_test_result <- ad.test(ThalesReturn)
+print(anderson_test_result)
+
+# D'Agostino's K-squared Test for Thales
+dagostino_test_result <- agostino.test(ThalesReturn, alternative = "two.sided")
+print(dagostino_test_result)
+
+# Jarque-Bera Test
+jarque_bera_test_result <- jarqueberaTest(ThalesReturn)
+print(jarque_bera_test_result)
+
+# Anscombe-Glynn Test
+anscombe_glynn_test_result <- anscombe.test(ThalesReturn)
+print(anscombe_glynn_test_result)
+
+# Bonett-Seier Test
+BonnTest <- bonett.test (ThalesReturn, alternative = "two.sided" )
+print(BonnTest)
+
+##Perform the multivariate tests: Pearson’s product moment correlation coefficient 
+#t-test, Spearman rank correlation test, Kendall’s tau correlation coefficient test. 
+#Are the results consistent? What is the difference among them? 
+#Provide interpretation and implications.
+
+
+#####WARNING######
+# ci dessous c'est a revoir, car les multivariate test sont utils pour tester la 
+#corrélation entre deux variables, mais du coup je ne comprends qu'elles sont les 
+# 2 variables à prendre, ici j'ai fait entre le prix et le volume mais ca n'a pas 
+# vraiment de sens. J'ai essayé
+#####WARNING######
+
+
+#Pearson Test
+Pearson <- cor.test (Thales$Close, Thales$Volume,method="pearson",alternative="two.sided",conf.level = 0.95)
+print(Pearson)
+
+#Spearman Test
+#Spearman <- cor.test(Thales$Close,Thales$Volume, method="spearman", alternative="two.sided")
+#print(Spearman)
+
+####WARNING####
+#SPEARMAN pas faisable il me semble##
+
+#Kendall Test
+kendall_test_result <- cor.test(Thales$Close,Thales$Volume, method = "kendall")
+print(kendall_test_result)
 
