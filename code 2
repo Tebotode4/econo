@@ -1,0 +1,272 @@
+setwd("~/Users/gregoirerouaud-jegou/Dossiers/R") 
+
+#Read all 5 csv files
+Thales = read.csv('HO.PA.csv', header = TRUE, sep=',')
+Safran = read.csv('SAF.PA.csv', header = TRUE, sep=',')
+Airbus = read.csv('AIR.PA.csv', header = TRUE, sep=',')
+Vinci = read.csv('DG.PA.csv', header = TRUE, sep=',')
+SchneiderElectric = read.csv('SU.PA.csv', header = TRUE, sep=',')
+
+#install additional packages and libraries
+install.packages('tidyverse')
+install.packages('fBasics')
+install.packages('nortest')
+install.packages('moments')
+library(moments)
+library(nortest)
+library(fBasics)
+library(tidyverse)
+library(dplyr)
+
+### Question 1
+
+#Calculate prices means for all 5 stocks
+ThalesPriceMean <- mean(Thales$Close)
+SafranPriceMean <- mean(Safran$Close)
+AirbusPriceMean <- mean(Airbus$Close)
+VinciPriceMean <- mean(Vinci$Close)
+SchneiderElectricPriceMean <- mean(SchneiderElectric$Close)
+
+#Calculate returns means for all 5 stocks
+
+#Calculate daily returns: Rt = [ Pt - Pt-1 ]/ Pt-1
+ThalesReturn = diff(Thales$Adj.Close)/Thales$Adj.Close[-length(Thales$Adj.Close)]
+#Calculate overall returns mean
+ThalesReturnMean <- mean(ThalesReturn) * 100
+#Same as Thales for all 4 remaining stock
+#For Safran
+SafranReturn = diff(Safran$Adj.Close)/Safran$Adj.Close[-length(Safran$Adj.Close)]
+SafranReturnMean <- mean(SafranReturn) * 100
+#For Airbus
+AirbusReturn = diff(Airbus$Adj.Close)/Airbus$Adj.Close[-length(Airbus$Adj.Close)]
+AirbusReturnMean <- mean(AirbusReturn) * 100
+#For Vinci
+VinciReturn = diff(Vinci$Adj.Close)/Vinci$Adj.Close[-length(Vinci$Adj.Close)]
+VinciReturnMean <- mean(VinciReturn) * 100
+#For Schneider Electric
+SchneiderElectricReturn = diff(SchneiderElectric$Adj.Close)/SchneiderElectric$Adj.Close[-length(SchneiderElectric$Adj.Close)]
+SchneiderElectricReturnMean <- mean(SchneiderElectricReturn) * 100
+
+
+#Calculate the confidence interval of Prices mean
+#For Thales
+ThalesPCI <- lm(Thales$Close ~ 1) 
+confint(ThalesPCI, level=0.95)
+#For Safran
+SafranPCI <- lm(Safran$Close ~ 1) 
+confint(SafranPCI, level=0.95)
+#For Airbus
+AirbusPCI <- lm(Airbus$Close ~ 1) 
+confint(AirbusPCI, level=0.95)
+#For Vinci
+VinciPCI <- lm(Vinci$Close ~ 1) 
+confint(VinciPCI, level=0.95)
+#For SchneiderElectric
+SchneiderElectricPCI <- lm(SchneiderElectric$Close ~ 1) 
+confint(SchneiderElectricPCI, level=0.95)
+
+
+#Calculate the confidence interval of Returns mean
+#For Thales
+ThalesRCI <- lm(ThalesReturn ~ 1) 
+confint(ThalesRCI, level=0.95)
+print(ThalesRCI)
+#For Safran
+SafranRCI <- lm(SafranReturn ~ 1) 
+confint(SafranRCI, level=0.95)
+print(SafranRCI)
+#For Airbus
+AirbusRCI <- lm(AirbusReturn ~ 1) 
+confint(AirbusRCI, level=0.95)
+print(AirbusRCI)
+#For Vinci
+VinciRCI <- lm(VinciReturn ~ 1) 
+confint(VinciRCI, level=0.95)
+print(VinciRCI)
+#For SchneiderElectric
+SchneiderElectricRCI <- lm(SchneiderElectricReturn ~ 1) 
+confint(SchneiderElectricRCI, level=0.95)
+print(SchneiderElectricRCI)
+
+#Calculate statistical significance of having the mean value higher/lower by 10% 
+#than the existing ones. Explain.
+
+# Assume you have already calculated ThalesPriceMean and ThalesPCI from previous code
+# Define the hypothesized mean values (mean ± 10%)
+Thales_H_mean_high <- ThalesPriceMean * 1.1
+Thales_H_mean_low <- ThalesPriceMean * 0.9
+
+# Perform t-test to check statistical significance for mean higher by 10%
+Thales_t_test_high <- t.test(Thales$Close, mu = Thales_H_mean_high)
+print(Thales_t_test_high)
+
+# Perform t-test to check statistical significance for mean lower by 10%
+Thales_t_test_low <- t.test(Thales$Close, mu = Thales_H_mean_low)
+
+# Print the results
+cat("T-test result for mean higher by 10%:\n")
+print(Thales_t_test_high)
+
+cat("\nT-test result for mean lower by 10%:\n")
+print(Thales_t_test_low)
+
+#For Safran:
+Safran_H_mean_high <- SafranPriceMean * 1.1
+Safran_H_mean_low <- SafranPriceMean * 0.9
+Safran_t_test_high <- t.test(Safran$Close, mu = Safran_H_mean_high)
+Safran_t_test_low <- t.test(Safran$Close, mu = Safran_H_mean_low)
+cat("T-test result for mean higher by 10%:\n")
+print(Safran_t_test_high)
+cat("\nT-test result for mean lower by 10%:\n")
+print(Safran_t_test_low)
+
+#For Airbus:
+Airbus_H_mean_high <- AirbusPriceMean * 1.1
+Airbus_H_mean_low <- AirbusPriceMean * 0.9
+Airbus_t_test_high <- t.test(Airbus$Close, mu = Airbus_H_mean_high)
+Airbus_t_test_low <- t.test(Airbus$Close, mu = Airbus_H_mean_low)
+cat("T-test result for mean higher by 10%:\n")
+print(Airbus_t_test_high)
+cat("\nT-test result for mean lower by 10%:\n")
+print(Airbus_t_test_low)
+
+#For Vinci:
+Vinci_H_mean_high <- VinciPriceMean * 1.1
+Vinci_H_mean_low <- VinciPriceMean * 0.9
+Vinci_t_test_high <- t.test(Vinci$Close, mu = Vinci_H_mean_high)
+Vinci_t_test_low <- t.test(Vinci$Close, mu = Vinci_H_mean_low)
+cat("T-test result for mean higher by 10%:\n")
+print(Vinci_t_test_high)
+cat("\nT-test result for mean lower by 10%:\n")
+print(Vinci_t_test_low)
+
+#For SchneiderElectric:
+SchneiderElectric_H_mean_high <- SchneiderElectricPriceMean * 1.1
+SchneiderElectric_H_mean_low <- SchneiderElectricPriceMean * 0.9
+SchneiderElectric_t_test_high <- t.test(SchneiderElectric$Close, mu = SchneiderElectric_H_mean_high)
+SchneiderElectric_t_test_low <- t.test(SchneiderElectric$Close, mu = SchneiderElectric_H_mean_low)
+cat("T-test result for mean higher by 10%:\n")
+print(SchneiderElectric_t_test_high)
+cat("\nT-test result for mean lower by 10%:\n")
+print(SchneiderElectric_t_test_low)
+
+### Question 2
+
+# Calculate general statistics for returns
+#For Thales
+return_stats <- function(returns) {
+  stats <- c(
+    Mean = mean(returns),
+    Trimmed_Mean = mean(returns, trim = 0.1),  # 10% trimming
+    Median = median(returns),
+    Variance = var(returns),
+    Std_Deviation = sd(returns),
+    Mean_Absolute_Deviation = mean(abs(returns - mean(returns))),
+    Median_Absolute_Deviation = median(abs(returns - median(returns))),
+    Quantiles_25th = quantile(returns, 0.25),
+    Quantiles_50th = quantile(returns, 0.5),
+    Quantiles_75th = quantile(returns, 0.75),
+    Kurtosis = kurtosis(returns),
+    Skewness = skewness(returns)
+  )
+  
+  return(stats)
+}
+
+# Calculate and print statistics for Thales returns
+Thales_return_stats <- return_stats(ThalesReturn)
+print(thales_return_stats)
+#For Safran
+Safran_return_stats <- return_stats(SafranReturn)
+print(safran_return_stats)
+#For Airbus
+Airbus_return_stats <- return_stats(AirbusReturn)
+print(Airbus_return_stats)
+#For Vinci
+Vinci_return_stats <- return_stats(VinciReturn)
+print(Vinci_return_stats)
+#For SchneiderElectric
+SchneiderElectric_return_stats <- return_stats(SchneiderElectricReturn)
+print(SchneiderElectric_return_stats)
+
+# Create a boxplot to check for outliers for Thales
+boxplot(ThalesReturn, main = "Boxplot of Returns for Thales", ylab = "Returns")
+# For Safran
+boxplot(SafranReturn, main = "Boxplot of Returns for Safran", ylab = "Returns")
+# For Airbus
+boxplot(AirbusReturn, main = "Boxplot of Returns for Airbus", ylab = "Returns")
+# For Vinci
+boxplot(VinciReturn, main = "Boxplot of Returns for Vinci", ylab = "Returns")
+# For SchneiderElectric
+boxplot(SchneiderElectricReturn, main = "Boxplot of Returns for Schneider Electric", ylab = "Returns")
+
+
+### Question 3
+
+#Select and perform 3 univariate tests for each series (e.g., Shapiro-Wilk, Kolmogorov-
+#Smirnov, Jarque-Bera, D’Agostino test of skewness, Anscombe-Glynn test of kurtosis, 
+#Bonett- Seier test of kurtosis, Anderson-Darling goodness of fit test). 
+#Explain why you select those three tests. Explain the results.
+
+#### WARNING #####
+#pour les tests suivants on doit en faire que 3 et expliquer pourquoi
+#on a choisi de faire ces 3 la et pas les autres
+#Une fois qu'on aura choisi les 3 qu'on veut faire on doit les répéter sur les 
+#4 autres actions (j'ai pas fait pour nous éviter de faire les autres pour r)
+####WARNING####
+
+# Shapiro-Wilk Test for Thales
+shapiro_test_result <- shapiro.test(ThalesReturn)
+print(shapiro_test_result)
+
+# Anderson-Darling Test for Thales
+anderson_test_result <- ad.test(ThalesReturn)
+print(anderson_test_result)
+
+# D'Agostino's K-squared Test for Thales
+dagostino_test_result <- agostino.test(ThalesReturn, alternative = "two.sided")
+print(dagostino_test_result)
+
+# Jarque-Bera Test
+jarque_bera_test_result <- jarqueberaTest(ThalesReturn)
+print(jarque_bera_test_result)
+
+# Anscombe-Glynn Test
+anscombe_glynn_test_result <- anscombe.test(ThalesReturn)
+print(anscombe_glynn_test_result)
+
+# Bonett-Seier Test
+BonnTest <- bonett.test (ThalesReturn, alternative = "two.sided" )
+print(BonnTest)
+
+### Question 4
+
+##Perform the multivariate tests: Pearson’s product moment correlation coefficient 
+#t-test, Spearman rank correlation test, Kendall’s tau correlation coefficient test. 
+#Are the results consistent? What is the difference among them? 
+#Provide interpretation and implications.
+
+
+#####WARNING######
+# ci dessous c'est a revoir, car les multivariate test sont utils pour tester la 
+#corrélation entre deux variables, mais du coup je ne comprends qu'elles sont les 
+# 2 variables à prendre, ici j'ai fait entre le prix et le volume mais ca n'a pas 
+# vraiment de sens. J'ai essayé
+#####WARNING######
+
+
+#Pearson Test
+Pearson <- cor.test (Thales$High, Thales$Close,method="pearson",alternative="two.sided",conf.level = 0.95)
+print(Pearson)
+
+#Spearman Test
+#Spearman <- cor.test(Thales$Close,Thales$Volume, method="spearman", alternative="two.sided")
+#print(Spearman)
+
+####WARNING####
+#SPEARMAN pas faisable il me semble#
+
+#Kendall Test
+kendall_test_result <- cor.test(Thales$Close,Thales$Volume, method = "kendall")
+print(kendall_test_result)
+
