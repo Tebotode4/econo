@@ -1,0 +1,58 @@
+ExRa <- read.csv('Exchange Rate USD Real.csv', header = TRUE, sep=',') 
+ExpToImp <- read.csv('Exports to Imports Ratio.csv', header = TRUE, sep=',')
+GDP <- read.csv('GDP.csv', header = TRUE, sep=',')
+GPolUnc <- read.csv('Global_Policy_Uncertainty_Data.csv', header = TRUE, sep=',')
+Index <- read.csv('Index.csv', header = TRUE, sep=',')
+Inflation <- read.csv('Inflation.csv', header = TRUE, sep=',')
+InterestRate <- read.csv('Interest Rate.csv', header = TRUE, sep=',')
+IOP <- read.csv('Iron Ore Price.csv', header = TRUE, sep=',')
+SoyB <- read.csv('SoyBean Price.csv', header = TRUE, sep=',')
+SugarP <- read.csv('Sugar Price.csv', header = TRUE, sep=',')
+
+install.packages('dplyr')
+install.packages('purrr')
+library(dplyr)
+library(purrr)
+
+
+
+merged_data <- reduce(list(ExRa, ExpToImp, GDP, GPolUnc, Index, Inflation, InterestRate, IOP, SoyB, SugarP), merge, by = "DATE", all = TRUE)
+
+# Print the first few rows of the merged dataset
+head(merged_data)
+
+Regression = lm(NGDPSAXDCBRQ~Exchange.Rate+EXPORTSTOIMPORTS+GEPU_current+Adj.Close+INFLATION+INTEREST+OREPRICE+SOYBEANPRICE+SUGARPRICE, data = merged_data)
+summary(Regression)
+plot(Regression)
+
+
+IndexReturn = diff(Index$Adj.Close)/Index$Adj.Close[-length(Index$Adj.Close)] * 100
+
+a <- c(merged_data$DATE)
+b <- c(IndexReturn)
+
+for(i in ((length(IndexReturn)+1):length(merged_data$DATE)))
+  +{IndexReturn = c(IndexReturn, 0)}
+
+merged_data["Return"] <- IndexReturn
+
+
+Index_dif = diff(merged_data$Adj.Close)
+ExRate_dif = diff(merged_data$Exchange.Rate)
+par(mfrow=c(1,1))
+plot(ExpImp_dif,Index_dif,xlab="change in GDP", ylab="change in Index") 
+summary(lm(Index_dif ~ ExpImp_dif)) 
+
+
+Sugar_dif = diff(merged_data$SUGARPRICE)
+Inflation_dif = diff(merged_data$INFLATION)
+Interest_dif = diff(merged_data$INTEREST)
+Return_dif = diff(merged_data$Return)
+
+anova(lm(Return_dif ~ ExRate_dif + Sugar_dif + Inflation_dif + Interest_dif))
+
+install.packages("leaps")
+library(leaps)
+subsets = regsubsets(Return_dif~., data=as.data.frame(cbind(ExRate_dif,Sugar_dif, Inflation_dif)),nbest=1)
+b = summary(subsets)
+b
